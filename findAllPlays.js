@@ -38,6 +38,9 @@ stream.once("close", () => {
       for (let currentStep = 0; currentStep < game.timeline.length; currentStep++) {
         // @ts-ignore
         const currentPlay = findCurrentlyPlayedWord(game, currentStep, playerIndex);
+        if (!currentPlay.isValid || currentPlay.word.length < 2) {
+          continue;
+        }
         if (currentPlay.word !== playedWord){
           playedWord = currentPlay.word;
           playedWords.push(playedWord);
