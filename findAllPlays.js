@@ -25,7 +25,7 @@ stream.once("close", () => {
   parser.end();
   const games = parser.games();
   /**
-   * @type {{ playedWords: string[]; incidentalWords: string[]; }[]}
+   * @type {{ playedWords: string[]; incidentalWords: string[]; players: string[] }[]}
    */
   const allPlays = [];
   console.log(`Found ${games.length} games`);
@@ -33,6 +33,9 @@ stream.once("close", () => {
     console.log(`Game ${game.id}`);
     let playedWords = [];
     let incidentalWords = [];
+    for (let player of game.players) {
+      incidentalWords.push(player.startingLetter);
+    }
     for (let playerIndex = 0; playerIndex < 16; playerIndex++) {
       let playedWord = "";
       for (let currentStep = 0; currentStep < game.timeline.length; currentStep++) {
@@ -45,6 +48,7 @@ stream.once("close", () => {
           playedWord = currentPlay.word;
           playedWords.push(playedWord);
           for (const play of currentPlay.findPlaysAcross()) {
+            if (play.isSameWordSamePosition(currentPlay)) continue;
             if (play.word.length > 1) {
               incidentalWords.push(play.word);
             }
@@ -54,7 +58,8 @@ stream.once("close", () => {
     }
     allPlays.push({
       playedWords,
-      incidentalWords
+      incidentalWords,
+      players: game.players.map(player => player.name)
     });
   });
 
